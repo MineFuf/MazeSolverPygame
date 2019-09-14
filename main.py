@@ -3,6 +3,7 @@ import sys
 from settings import *
 from sprites import *
 
+
 class Game:
     def __init__(self):
         pg.init()
@@ -19,6 +20,25 @@ class Game:
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+
+        lines = ['################', '#..............#',
+                 '#.P............#', '#..............#',
+                 '#..............#', '#..............#',
+                 '#..............#', '#..............#',
+                 '#..............#', '#..............#',
+                 '#..............#', '#..............#',
+                 '#..............#', '#...........E..#',
+                 '#..............#', '################']
+        for idx, line in enumerate(lines):
+            for idy, tile in enumerate(line):
+                if tile == '#':
+                    Wall(self, idx, idy)
+                elif tile == 'P':
+                    self.player = Player(self, idx, idy)
+                elif tile == 'E':
+                    self.exit = vec(idx, idy)
+
+        '''
         walls = []
 
         for i in range(int(WIDTH / TILESIZE)):
@@ -41,6 +61,7 @@ class Game:
                         self.player = Player(self, i, j)
                         print('Created player at ' + str((i, j)))
                         is_found_free = True
+        '''
 
     def run(self):
         # game loop - set self.playing = False to end the game

@@ -70,3 +70,16 @@ class Wall(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+
+
+class Exit():
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites
+        pg.sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.pos = vec(x, y)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
