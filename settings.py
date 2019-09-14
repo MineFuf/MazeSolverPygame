@@ -8,15 +8,15 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
 # game settings
-WIDTH = 512
-HEIGHT = 512  # 16 * 48 or 32 * 24 or 64 * 12
-FPS = 60
+WIDTH = int(582 * 1.5)
+HEIGHT = int(582 * 1.5)  # 16 * 48 or 32 * 24 or 64 * 12
+FPS = 200
 TITLE = "Automate Maze Solver"
 BGCOLOR = DARKGREY
 
-TILESIZE = 32
+TILESIZE = 9
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
 # player settings
-PLAYER_MOVE_DELAY = 150
+PLAYER_MOVE_DELAY = 1
