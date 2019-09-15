@@ -17,7 +17,7 @@ class Game:
         self.start = pg.time.get_ticks()
 
     def load_data(self):
-        pass
+        self.homedir = path.dirname(__file__)
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -75,7 +75,7 @@ class Game:
                  '#.#.#.#######.###.#######.###.###',
                  '#.#.#...#.#.#...#.#.....#.#.....#',
                  '#####.###.#.#.#.#.###.#.#.#######',
-                 '#...........#.#.#.#...#...#.#...#',
+                 '#....P......#.#.#.#...#...#.#...#',
                  '#.###.#.#.###########.#.###.###.#',
                  '#...#.#.#.#.....#...#.#...#...#.#',
                  '###.#######.###.#.#####.###.#.#.#',
@@ -94,12 +94,12 @@ class Game:
                  '#...#...#.......#.#...#...#.#.#.#',
                  '###.#######.#########.#.#####.#.#',
                  '#.#.#.......#.......#.......#...#',
-                 '#.#.###.#####.###.#.#.#####.#.#P#',
+                 '#.#.###.#####.###.#.#.#####.#.#.#',
                  '#.........#.....#.#...#.......#E#',
                  '#################################']
         self.lines01 = [
                 '#################################################################################################',
-                '#P#.#.#...#.......#...#.#.....#.#.#.#.#.....#...#.............#.................#...#.#.......#.#',
+                '#.#.#.#...#.......#...#.#.....#.#.#.#.#.....#...#.............#.................#...#.#.......#.#',
                 '#.#.#.###.#.###.###.###.#.#.#.#.#.#.#.###.#####.#.#.###.#.###.#.#.#.#.#####.###.#.###.###.#####.#',
                 '#.#.....#.#...#.....#.#.#.#.#.#.#...#...#...#.#...#...#.#.#...#.#.#.#...#...#...#.#.#.......#...#',
                 '#.###.###.#.#######.#.#.#.#.###.#.#.#.#####.#.#.#.###.#.###.###.#.###.###.#######.#.###.#######.#',
@@ -158,7 +158,7 @@ class Game:
                 '#.........#.#.#.#.#.....#...#.....#.#.....#.#.#...#.........#...#.#.#.#.#...#.#.#.....#.....#...#',
                 '#.#.###.###.#.#.#########.###.#.#.###.###.#.#.###.###########.###.#.#.#######.###.###.#####.#.###',
                 '#.#.#.....#.#.#.#...#.....#...#.#...#.#.....#...#.#.....#...#.#.......#.......#.#...#.....#.#.#.#',
-                '#.#.#.#.#######.#.#.#.#####.#.###.#####.###########.#.###.###.###.###.#.#.#####.#.#########.#.#.#',
+                '#.#.#.#.#######.#.#.#E#####.#.###.#####.###########.#.###.###.###.###.#.#.#####.#.#########.#.#.#',
                 '#.#.#.#...#.#...#.#.......#.#.#.....#...#...#...#...#.......#.#.#.#...#.#.....#...#.....#...#...#',
                 '#.###.#.###.#.#.#.#.###.#.#.#.#.#####.#####.#.#.#.#.#.#.#####.#.#.###.#.#####.###.###.#.#.#.###.#',
                 '#.#...#.#...#.#...#.#.#.#...#.#...#.#.#...#...#...#.#.#.#.....#.#.#...#.#.#.#.........#.#.#...#.#',
@@ -191,9 +191,9 @@ class Game:
                 '###########.#.#####.#.###.#########.#.#.#####.#######.###.#.###.#######.###.#.#######.#.#.#.#.#.#',
                 '#...........#.#.#...#...#...#.#.....#.#.#.......#.#...#.........#.......#...#.....#...#.#.#.#.#.#',
                 '###.#######.###.###.###.#####.###.#####.#####.#.#.#.###.###.###########.#.###.###.###.#####.###.#',
-                '#.#.....#...#...#.#.#...#...#.#.#...#.....#.#.#...#.#...#.#.#.....#.#.#...#.....#.#.#.#...#.....#',
+                '#.#.....#...#...#.#.#...#...#.#.#...#.....#.#.#...#.#...#.#.#....P#.#.#...#.....#.#.#.#...#.....#',
                 '#.#.#####.###.###.#####.#.###.#.#.#.#.###.#.#####.#.###.#.#.###.#.#.#.###.#.#.#####.#.#.###.#.#.#',
-                '#.....#.............#.........#...#...#.....#.............#.#...#.........#.#.......#...#...#.#E#',
+                '#.....#.............#.........#...#...#.....#.............#.#...#.........#.#.......#...#...#.#.#',
                 '#################################################################################################'
                 ]
         self.lines02 = [
@@ -253,7 +253,10 @@ class Game:
                     self.exit = Exit(self, idx, idy)
 
         self.path_tiles[int(self.player.pos.y)][int(self.player.pos.x)] = True
-        self.export_maze(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'maze0.png'))))
+        self.export_maze(path.join(self.homedir, 'maze.jpg'))
+
+        # self.screen.blit(pg.image.load(path.join(self.homedir, 'maze.jpg')), vec(0, 0))
+        # pg.display.update()
 
     def run(self):
         # game loop - set self.playing = False to end the game
@@ -285,9 +288,10 @@ class Game:
         # self.draw_grid()
         self.all_sprites.draw(self.screen)
         self.screen.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
-        # self.screen.blit(self.exit.image, (self.exit.rect.x, self.exit.rect.y))
+        self.screen.blit(self.exit.image, (self.exit.rect.x, self.exit.rect.y))
         pg.display.set_caption('{:02f}'.format(self.clock.get_fps()))
         pg.display.update()
+        pass
 
     def events(self):
         # catch all events here
@@ -302,8 +306,13 @@ class Game:
         print(str(timelapse / 1000) + 's')
         # print(str(timelapse / 1000 / 60) + 'min')
         # print('Traveled: ' + self.path_string)
-        self.export_path(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path0.png'))))
+        self.export_path(path.join(self.homedir, 'path.jpg'))
         print('Path exported')
+
+        self.screen.blit(pg.image.load(path.join(self.homedir, 'path.jpg')), vec(0, 0))
+        pg.display.update()
+        while True:
+            self.events()
 
     def export_maze(self, path):
         img = pg.Surface((WIDTH, HEIGHT))
@@ -350,26 +359,26 @@ class Game:
                     if ways < 2:
                         tiles[idl][idt] = False
 
-        with open(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path0.txt'))), 'w') as f:
-            for line in self.path_tiles:
-                f.write('[')
-                for tile in line:
-                    tilev = '.'
-                    if tile:
-                        tilev = '#'
-                    f.write('[' + str(tilev) + '],')
-                f.write(']\n')
+        # with open(path.join(self.homedir, 'old_path.txt'), 'w') as f:
+        #     for line in self.path_tiles:
+        #         f.write('[')
+        #         for tile in line:
+        #             tilev = '.'
+        #             if tile:
+        #                 tilev = '#'
+        #             f.write('[' + str(tilev) + '],')
+        #         f.write(']\n')
 
         self.path_tiles = tiles
-        with open(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path1.txt'))), 'w') as f:
-            for line in self.path_tiles:
-                f.write('[')
-                for tile in line:
-                    tilev = '.'
-                    if tile:
-                        tilev = '#'
-                    f.write('[' + str(tilev) + '],')
-                f.write(']\n')
+        # with open(path.join(self.homedir, 'new_path.txt'), 'w') as f:
+        #     for line in self.path_tiles:
+        #         f.write('[')
+        #         for tile in line:
+        #             tilev = '.'
+        #             if tile:
+        #                 tilev = '#'
+        #             f.write('[' + str(tilev) + '],')
+        #         f.write(']\n')
 
 
 # create the game object

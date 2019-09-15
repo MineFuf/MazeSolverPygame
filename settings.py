@@ -9,9 +9,11 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
 # game settings
+# WIDTH = 679
+# HEIGHT = 679
 WIDTH = 528
-HEIGHT = 528  # 16 * 48 or 32 * 24 or 64 * 12
-FPS = 200
+HEIGHT = 528
+FPS = 2000
 TITLE = "Automate Maze Solver"
 BGCOLOR = DARKGREY
 
