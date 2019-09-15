@@ -13,6 +13,7 @@ class Game:
         self.clock = pg.time.Clock()
         pg.key.set_repeat(100, 500)
         self.load_data()
+        self.start = pg.time.get_ticks()
 
     def load_data(self):
         pass
@@ -23,7 +24,12 @@ class Game:
         self.walls = pg.sprite.Group()
         self.paths = pg.sprite.Group()
 
-        lines00 = ['#################################################',
+        self.path_string, self.short_path_string = '', ''
+        self.path_tiles = [[]]
+        self.loops_count = [[]]
+
+
+        self.lines00 = ['#################################################',
                  '#P.#........#..#..#..#....................#.....#',
                  '#..####..####..#..#..#..####..####..#..#..#..#..#',
                  '#....................#.....#.....#..#..#..#..#..#',
@@ -90,7 +96,7 @@ class Game:
                  '#.#.###.#####.###.#.#.#####.#.#.#',
                  '#.........#.....#.#...#.......#.#',
                  '###############################E#']
-        lines = [
+        self.lines = [
                 '#################################################################################################',
                 '#P#.#.#...#.......#...#.#.....#.#.#.#.#.....#...#.............#.................#...#.#.......#.#',
                 '#.#.#.###.#.###.###.###.#.#.#.#.#.#.#.###.#####.#.#.###.#.###.#.#.#.#.#####.###.#.###.###.#####.#',
@@ -186,10 +192,45 @@ class Game:
                 '###.#######.###.###.###.#####.###.#####.#####.#.#.#.###.###.###########.#.###.###.###.#####.###.#',
                 '#.#.....#...#...#.#.#...#...#.#.#...#.....#.#.#...#.#...#.#.#.....#.#.#...#.....#.#.#.#...#.....#',
                 '#.#.#####.###.###.#####.#.###.#.#.#.#.###.#.#####.#.###.#.#.###.#.#.#.###.#.#.#####.#.#.###.#.#.#',
-                '#.....#.............#.........#...#...#.....#.............#.#...#.........#.#.......#...#...#.#.#',
-                '###############################################################################################E#'
+                '#.....#.............#.........#...#...#.....#.............#.#...#.........#.#.......#...#...#.#E#',
+                '#################################################################################################'
                 ]
-        for idy, line in enumerate(lines):
+        self.lines02 = [
+            '#######',
+            '#.#P#.#',
+            '###.###',
+            '#E....#',
+            '#######',
+            '#######',
+            '#######'
+        ]
+
+        for j in range(len(self.lines)):
+            self.path_tiles.append([])
+            for i in range(len(self.lines[0])):
+                self.path_tiles[j].append(False)
+
+        for j in range(len(self.lines)):
+            self.loops_count.append([])
+            for i in range(len(self.lines[0])):
+                if self.lines[j][i] == '#':
+                    self.loops_count[j].append(-1)
+                else:
+                    ways = 0
+                    if self.lines[j - 1][i] != '#':
+                        ways += 1
+                    if self.lines[j + 1][i] != '#':
+                        ways += 1
+                    if self.lines[j][i - 1] != '#':
+                        ways += 1
+                    if self.lines[j][i + 1] != '#':
+                        ways += 1
+                    self.loops_count[j].append(ways)
+
+        for line in self.loops_count:
+            print(line)
+
+        for idy, line in enumerate(self.lines):
             for idx, tile in enumerate(line):
                 if tile == '#':
                     Wall(self, idx, idy)
@@ -198,6 +239,7 @@ class Game:
                 elif tile == 'E':
                     self.exit = Exit(self, idx, idy)
 
+        self.path_tiles[int(self.player.pos.y)][int(self.player.pos.x)] = True
         self.export_maze(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'maze0.png'))))
 
     def run(self):
@@ -227,9 +269,10 @@ class Game:
 
     def draw(self):
         self.screen.fill(BGCOLOR)
-        self.draw_grid()
-        self.all_sprites.draw(self.screen)
+        # self.draw_grid()
+        # self.all_sprites.draw(self.screen)
         self.screen.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
+        self.screen.blit(self.exit.image, (self.exit.rect.x, self.exit.rect.y))
         pg.display.set_caption('{:02f}'.format(self.clock.get_fps()))
         pg.display.flip()
 
@@ -243,7 +286,13 @@ class Game:
         pass
 
     def show_go_screen(self):
-        pass
+        timelapse = pg.time.get_ticks() - self.start
+        print(str(timelapse) + 'm')
+        print(str(timelapse / 1000) + 's')
+        print(str(timelapse / 1000 / 60) + 'min')
+        print('Traveled' + self.path_string)
+        self.export_path(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path0.png'))))
+        print('Path exported')
 
     def export_maze(self, path):
         img = pg.Surface((WIDTH, HEIGHT))
@@ -251,11 +300,21 @@ class Game:
             img.blit(wall.image, (wall.pos.x * TILESIZE, wall.pos.y * TILESIZE))
         pg.image.save(img, path)
 
+    def export_path(self, path):
+        img = pg.Surface((WIDTH, HEIGHT))
+        for idl, line in enumerate(self.path_tiles):
+            for idt, tile in enumerate(line):
+                if tile:
+                    square = pg.Surface((TILESIZE, TILESIZE))
+                    square.fill(BLUE)
+                    img.blit(square, (idt * TILESIZE, idl * TILESIZE))
+        pg.image.save(img, path)
+
 
 # create the game object
 g = Game()
 g.show_start_screen()
-while True:
-    g.new()
-    g.run()
-    g.show_go_screen()
+
+g.new()
+g.run()
+g.show_go_screen()

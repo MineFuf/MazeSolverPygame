@@ -5,11 +5,12 @@ DARKGREY = (40, 40, 40)
 LIGHTGREY = (100, 100, 100)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
 # game settings
-WIDTH = int(582 * 1.5)
-HEIGHT = int(582 * 1.5)  # 16 * 48 or 32 * 24 or 64 * 12
+WIDTH = 873
+HEIGHT = 873  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 200
 TITLE = "Automate Maze Solver"
 BGCOLOR = DARKGREY
