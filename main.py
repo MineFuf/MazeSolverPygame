@@ -3,6 +3,7 @@ import sys
 from settings import *
 from sprites import *
 from os import path
+from copy import deepcopy
 
 
 class Game:
@@ -62,9 +63,9 @@ class Game:
                  '#..#..#..#..#..####..####..#######..#..####..#..#',
                  '#..#.....#..#...........#...........#.....#..#..#',
                  '###############################################E#']
-        lines01 = [
+        self.lines = [
                  '#################################',
-                 '#P#...#.....#.....#.......#.....#',
+                 '#.#...#.....#.....#.......#.....#',
                  '#.#.#.###.###.###.###.#####.#####',
                  '#...#.#.#.#...#.....#.#.........#',
                  '#.#.#.#.#.###.#####.#.#.#####.#.#',
@@ -93,10 +94,10 @@ class Game:
                  '#...#...#.......#.#...#...#.#.#.#',
                  '###.#######.#########.#.#####.#.#',
                  '#.#.#.......#.......#.......#...#',
-                 '#.#.###.#####.###.#.#.#####.#.#.#',
-                 '#.........#.....#.#...#.......#.#',
-                 '###############################E#']
-        self.lines = [
+                 '#.#.###.#####.###.#.#.#####.#.#P#',
+                 '#.........#.....#.#...#.......#E#',
+                 '#################################']
+        self.lines01 = [
                 '#################################################################################################',
                 '#P#.#.#...#.......#...#.#.....#.#.#.#.#.....#...#.............#.................#...#.#.......#.#',
                 '#.#.#.###.#.###.###.###.#.#.#.#.#.#.#.###.#####.#.#.###.#.###.#.#.#.#.#####.###.#.###.###.#####.#',
@@ -204,6 +205,17 @@ class Game:
             '#######',
             '#######'
         ]
+        self.lines03 = [
+                    '#########',
+                    '#P..#...#',
+                    '#.###.###',
+                    '#...#...#',
+                    '#.#.#.###',
+                    '#.#.....#',
+                    '#.#####.#',
+                    '#.....#E#',
+                    '#########'
+                    ]
 
         for j in range(len(self.lines)):
             self.path_tiles.append([])
@@ -236,6 +248,7 @@ class Game:
                     Wall(self, idx, idy)
                 elif tile == 'P':
                     self.player = Player(self, idx, idy)
+                    self.startpoint = vec(idx, idy)
                 elif tile == 'E':
                     self.exit = Exit(self, idx, idy)
 
@@ -270,11 +283,11 @@ class Game:
     def draw(self):
         self.screen.fill(BGCOLOR)
         # self.draw_grid()
-        # self.all_sprites.draw(self.screen)
+        self.all_sprites.draw(self.screen)
         self.screen.blit(self.player.image, (self.player.rect.x, self.player.rect.y))
-        self.screen.blit(self.exit.image, (self.exit.rect.x, self.exit.rect.y))
+        # self.screen.blit(self.exit.image, (self.exit.rect.x, self.exit.rect.y))
         pg.display.set_caption('{:02f}'.format(self.clock.get_fps()))
-        pg.display.flip()
+        pg.display.update()
 
     def events(self):
         # catch all events here
@@ -282,15 +295,13 @@ class Game:
             if event.type == pg.QUIT:
                 self.quit()
 
-    def show_start_screen(self):
-        pass
-
     def show_go_screen(self):
         timelapse = pg.time.get_ticks() - self.start
-        print(str(timelapse) + 'm')
+        self.path_tiles[int(self.exit.pos.y)][int(self.exit.pos.x)] = True
+        # print(str(timelapse) + 'm')
         print(str(timelapse / 1000) + 's')
-        print(str(timelapse / 1000 / 60) + 'min')
-        print('Traveled' + self.path_string)
+        # print(str(timelapse / 1000 / 60) + 'min')
+        # print('Traveled: ' + self.path_string)
         self.export_path(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path0.png'))))
         print('Path exported')
 
@@ -300,8 +311,15 @@ class Game:
             img.blit(wall.image, (wall.pos.x * TILESIZE, wall.pos.y * TILESIZE))
         pg.image.save(img, path)
 
-    def export_path(self, path):
+    def return_maze(self):
         img = pg.Surface((WIDTH, HEIGHT))
+        for wall in self.walls:
+            img.blit(wall.image, (wall.pos.x * TILESIZE, wall.pos.y * TILESIZE))
+        return img
+
+    def export_path(self, path):
+        self.find_bad_paths()
+        img = self.return_maze()
         for idl, line in enumerate(self.path_tiles):
             for idt, tile in enumerate(line):
                 if tile:
@@ -310,10 +328,52 @@ class Game:
                     img.blit(square, (idt * TILESIZE, idl * TILESIZE))
         pg.image.save(img, path)
 
+    def find_bad_paths(self):
+        tiles = deepcopy(self.path_tiles)
+        for idl, line in enumerate(self.path_tiles):
+            for idt, tile in enumerate(line):
+                if tile:
+                    ways = 0
+                    if self.path_tiles[idl - 1][idt]:
+                        ways += 1
+                    if self.path_tiles[idl + 1][idt]:
+                        ways += 1
+                    if self.path_tiles[idl][idt - 1]:
+                        ways += 1
+                    if self.path_tiles[idl][idt + 1]:
+                        ways += 1
+
+                    if idl == self.exit.pos.y and idt == self.exit.pos.x or \
+                            idl == self.startpoint.y and idt == self.startpoint.x:
+                        ways += 1
+
+                    if ways < 2:
+                        tiles[idl][idt] = False
+
+        with open(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path0.txt'))), 'w') as f:
+            for line in self.path_tiles:
+                f.write('[')
+                for tile in line:
+                    tilev = '.'
+                    if tile:
+                        tilev = '#'
+                    f.write('[' + str(tilev) + '],')
+                f.write(']\n')
+
+        self.path_tiles = tiles
+        with open(path.expanduser(path.join(path.expanduser('~'), path.join('Desktop', 'path1.txt'))), 'w') as f:
+            for line in self.path_tiles:
+                f.write('[')
+                for tile in line:
+                    tilev = '.'
+                    if tile:
+                        tilev = '#'
+                    f.write('[' + str(tilev) + '],')
+                f.write(']\n')
+
 
 # create the game object
 g = Game()
-g.show_start_screen()
 
 g.new()
 g.run()

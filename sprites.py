@@ -70,20 +70,20 @@ class Player(pg.sprite.Sprite):
                 self.game.path_string += '180f;'
 
             if -1 < self.game.loops_count[int(self.pos.y)][int(self.pos.x)] <= 1:
-                ways = 0
-                if self.game.lines[int(self.pos.y) - 1][int(self.pos.x)] != '#':
-                    ways += 1
-                if self.game.lines[int(self.pos.y) + 1][int(self.pos.x)] != '#':
-                    ways += 1
-                if self.game.lines[int(self.pos.y)][int(self.pos.x) - 1] != '#':
-                    ways += 1
-                if self.game.lines[int(self.pos.y)][int(self.pos.x) + 1] != '#':
-                    ways += 1
-                self.game.loops_count[int(self.pos.y)][int(self.pos.x) + 1] = ways
+                # ways = 0
+                # if self.game.lines[int(self.pos.y) - 1][int(self.pos.x)] != '#':
+                #     ways += 1
+                # if self.game.lines[int(self.pos.y) + 1][int(self.pos.x)] != '#':
+                #     ways += 1
+                # if self.game.lines[int(self.pos.y)][int(self.pos.x) - 1] != '#':
+                #     ways += 1
+                # if self.game.lines[int(self.pos.y)][int(self.pos.x) + 1] != '#':
+                #     ways += 1
+                self.game.loops_count[int(self.pos.y)][int(self.pos.x) + 1] = -1
                 self.game.path_tiles[int(self.pos.y)][int(self.pos.x)] = False
             elif self.game.loops_count[int(self.pos.y)][int(self.pos.x)] > -1:
                 self.game.path_tiles[int(self.pos.y)][int(self.pos.x)] = True
-                self.game.loops_count[int(self.pos.y)][int(self.pos.x) + 1] -= 1
+                self.game.loops_count[int(self.pos.y)][int(self.pos.x)] -= 1
 
             # self.game.path_tiles[int(self.pos.y)][int(self.pos.x)] = not self.game.path_tiles[int(self.pos.y)][int(self.pos.x)]
             # print(self.dir)
